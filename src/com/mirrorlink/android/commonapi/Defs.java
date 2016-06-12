@@ -1,5 +1,5 @@
-/* Copyright 2013-2014 RealVNC ltd.
- * Portions Copyright 2011-2014 Car Connectivity Consortium LLC
+/* Copyright 2013-2016 RealVNC ltd.
+ * Portions Copyright 2011-2016 Car Connectivity Consortium LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,6 +63,14 @@ public class Defs {
          * Intents used by applications to bind to the MirrorLink Server CommonAPI service.
          */
         public static final String BIND_MIRRORLINK_API = "com.mirrorlink.android.service.BIND";
+        /**
+         * Application can use the “com.mirrorlink.android.service.API_LEVEL” integer extra to specify the
+         * Common API level they wish to bind to. If a MirrorLink Server does not support a particular API
+         * level, it will fail the bind operation.
+         * In the absence of the “com.mirrorlink.android.service.API_LEVEL” extra, MirrorLink Servers
+         * will return the Android CommonAPI Service Level 1 binder from the bind request.
+         */
+        public static final String BIND_MIRRORLINK_API_LEVEL_EXTRA = "com.mirrorlink.android.service.API_LEVEL";
         /**
          * Intent used by the MirrorLink service to ask applications to launch. All the MirrorLink
          * aware applications must handle this Intent and connect to the MirrorLink service once
@@ -230,20 +238,20 @@ public class Defs {
      */
     public static final class VirtualKeyboardSupport {
         /**
-         * Flag, to indicate the availability of a virtual keyboard 
-         * from the MirrorLink Server. 
+         * Flag, to indicate the availability of a virtual keyboard
+         * from the MirrorLink Server.
          * boolean
          */
         public static final String AVAILABLE = "AVAILABLE";
         /**
-         * Flag, to indicate whether the virtual keyboard supports 
-         * touch events. 
+         * Flag, to indicate whether the virtual keyboard supports
+         * touch events.
          * boolean
          */
         public static final String TOUCH_SUPPORT = "TOUCH_SUPPORT";
         /**
-         * Flag, to indicate whether the virtual keyboard supports 
-         * knob events. 
+         * Flag, to indicate whether the virtual keyboard supports
+         * knob events.
          * boolean
          */
         public static final String KNOB_SUPPORT = "KNOB_SUPPORT";
@@ -413,7 +421,7 @@ public class Defs {
         public static final String SERVER_PIXEL_WIDTH = "SERVER_PIXEL_WIDTH";
         /**
          * Vertical resolution in pixel, after the MirrorLink Server has scaled the application
-         * framebuffer. 
+         * framebuffer.
          * uint16 packaged as an int
          */
         public static final String SERVER_PIXEL_HEIGHT = "SERVER_PIXEL_HEIGHT";
@@ -460,7 +468,7 @@ public class Defs {
          */
         public static final String DISTANCE = "DISTANCE";
         /**
-         * Number of application-level pixels, which will fit into 1 mm of Client Display space. 
+         * Number of application-level pixels, which will fit into 1 mm of Client Display space.
          * float
          * <br>
          * Note: This value is the same for the horizontal and vertical dimension.
@@ -564,6 +572,7 @@ public class Defs {
         /**
          * KNOB_KEY_SUPPORT values.
          */
+        public static final int KNOB_KEY_SUPPORT_SHIFT_X_0  = 0x00000001;
         public static final int KNOB_KEY_SUPPORT_SHIFT_Y_0  = 0x00000002;
         public static final int KNOB_KEY_SUPPORT_SHIFT_XY_0 = 0x00000004;
         public static final int KNOB_KEY_SUPPORT_PUSH_Z_0   = 0x00000008;
@@ -686,10 +695,38 @@ public class Defs {
         /**
          * IContextListener.onAudioBlocked reason values.
          */
+        /**
+         * Audio is unblocked, IContextListener.onAudioUnblocked will be sent
+         */
+        public static final int AUDIOBLOCKED_APPLICATION_UNBLOCKED = 0x0000;
+        /**
+         * Not allowed application category
+         *
+         * Audio from MirrorLink-aware applications not supported for with given application category
+         */
         public static final int AUDIOBLOCKED_APPLICATION_CATEGORY_NOT_ALLOWED = 0x0001;
+        /**
+         * Not sufficient application trust level
+         *
+         * Audio is blocked from the MirrorLink Client for certification status reason;
+         * either because of missing base certification in park mode or for missing drive certification
+         * in drive-mode
+         */
         public static final int AUDIOBLOCKED_APPLICATION_NOT_TRUSTED = 0x0002;
+        /**
+         * Not allowed application ID
+         */
         public static final int AUDIOBLOCKED_APPLICATION_UNIQUE_ID_NOT_ALLOWED = 0x0004;
+        /**
+         * Global audio muted
+         */
         public static final int AUDIOBLOCKED_GLOBALLY_MUTED = 0x0008;
+        /**
+         * Audio stream, as given by application ID, muted
+         *
+         * Audio stream of the respective application muted due to higher priority internal audio playback,
+         * typically initiated by the use
+         */
         public static final int AUDIOBLOCKED_STREAM_MUTED = 0x0010;
         /**
          * IContextListener.onFramebufferBlocked reason values.
@@ -697,10 +734,7 @@ public class Defs {
         /**
          * Not allowed content category.
          *
-         * An application will receive this blocking notification if it has previously set the
-         * framebuffer context information via {@link
-         * IContextManager#setFramebufferContextInformation} with the handleBlocking parameter
-         * set to true.
+         * @deprecated this blocking reason MAY be ignored.
          *
          * On reception of the callback with this reason number, the application MUST immediately
          * update its user interface and the application category. If no action is taken straight
@@ -715,15 +749,14 @@ public class Defs {
          *
          * @see IContextListener#onFramebufferBlocked
          */
+        @Deprecated
         public static final int DISPLAYBLOCKED_CONTENT_CATEGORY_NOT_ALLOWED = 0x0001;
 
         /**
          * Not allowed application category.
          *
-         * An application will receive this blocking notification if it has previously set the
-         * framebuffer context information via {@link
-         * IContextManager#setFramebufferContextInformation} with the handleBlocking parameter
-         * set to true.
+         * Application is blocked because MirrorLink aware applications with given application category are
+         * not supported in park mode
          *
          * On reception of the callback with this reason number, the application MUST immediately
          * update its user interface and the application category. If no action is taken straight
@@ -743,10 +776,7 @@ public class Defs {
         /**
          * Not sufficient content trust level.
          *
-         * An application will not receive this blocking notification, even if it has previously set
-         * the framebuffer context information via {@link
-         * IContextManager#setFramebufferContextInformation} with the handleBlocking parameter
-         * set to true.
+         * @deprecated this blocking reason MAY be ignored.
          *
          * The server will handle this itself and switch applications, as the code means the
          * application is non-certified.
@@ -758,10 +788,8 @@ public class Defs {
         /**
          * Not sufficient application trust level.
          *
-         * An application will not receive this blocking notification, even if it has previously set
-         * the framebuffer context information via {@link
-         * IContextManager#setFramebufferContextInformation} with the handleBlocking parameter
-         * set to true.
+         * Application is blocked for certification status reason; either because of
+         * missing base certification in park mode or for missing drive certification in drive-mode.
          *
          * The server will handle this itself and switch applications, as the code means the
          * application is non-certified.
@@ -773,25 +801,20 @@ public class Defs {
         /**
          * Content rules not followed.
          *
-         * An application will not receive this blocking notification, even if it has previously set
-         * the framebuffer context information via {@link
-         * IContextManager#setFramebufferContextInformation} with the handleBlocking parameter
-         * set to true.
+         * @deprecated this blocking reason MAY be ignored.
          *
          * The server will handle this itself and switch applications, as the code means the
          * application is non-certified.
          *
          * @see IContextListener#onFramebufferBlocked
          */
+        @Deprecated
         public static final int DISPLAYBLOCKED_CONTENT_RULES_NOT_FOLLOWED = 0x0010;
 
         /**
          * Not allowed application ID.
          *
-         * An application will not receive this blocking notification, even if it has previously set
-         * the framebuffer context information via {@link
-         * IContextManager#setFramebufferContextInformation} with the handleBlocking parameter
-         * set to true.
+         * Application is blocked because it is unknown
          *
          * The server will handle this itself and switch applications, as the MirrorLink Client uses
          * this flag if it blocks an application for certificate status reasons.
@@ -803,13 +826,10 @@ public class Defs {
         /**
          * UI not in focus on remote display.
          *
+         * @deprecated this blocking reason MAY be ignored.
+         *
          * This notifies the application that the user currently cannot interact with the
          * application using touch and/or knob events, but the application is still visible.
-         *
-         * An application will receive this blocking notification if it has previously set the
-         * framebuffer context information via {@link
-         * IContextManager#setFramebufferContextInformation} with the handleBlocking parameter
-         * set to true.
          *
          * An application that does handle blocking will receive the {@link
          * IContextListener#onFramebufferUnblocked} once the Client stops sending blocking
@@ -820,18 +840,13 @@ public class Defs {
          *
          * @see IContextListener#onFramebufferBlocked
          */
+        @Deprecated
         public static final int DISPLAYBLOCKED_UI_NOT_IN_FOCUS = 0x0100;
 
         /**
          * UI not visible on remote display.
          *
-         * This notifies the application that the user currently cannot see the application on the
-         * MirrorLink Client's display.
-         *
-         * An application will receive this blocking notification if it has previously set the
-         * framebuffer context information via {@link
-         * IContextManager#setFramebufferContextInformation} with the handleBlocking parameter
-         * set to true.
+         * The MirrorLink Client has moved the application into the background on its display.
          *
          * An application that does handle blocking will receive the {@link
          * IContextListener#onFramebufferUnblocked} once the Client starts making framebuffer
@@ -840,6 +855,21 @@ public class Defs {
          * @see IContextListener#onFramebufferBlocked
          */
         public static final int DISPLAYBLOCKED_UI_NOT_VISIBLE = 0x0200;
+
+        /**
+         * UI layout not supported
+         *
+         * The MirrorLink Client does not support the new orientation. The MirrorLink Server
+         * MUST handle the blocking and MUST switch back to the previous orientation
+         *
+         * An application that does handle blocking will receive the {@link
+         * IContextListener#onFramebufferUnblocked} once the Client starts making framebuffer
+         * update requests again.
+         *
+         * @see IContextListener#onFramebufferBlocked
+         */
+        public static final int DISPLAYBLOCKED_UI_LAYOUT_NOT_SUPPORTED = 0x0400;
+
     }
     /**
      * 4.9.1, 4.9.3 Framebuffer and Audio Context Information values.
@@ -890,6 +920,32 @@ public class Defs {
         public static final int VISUAL_CONTENT_CATEGORY_UI = 0x00000020;
         public static final int VISUAL_CONTENT_CATEGORY_CAR_MODE = 0x00010000;
         public static final int VISUAL_CONTENT_CATEGORY_MISC = 0x80000000;
+        /**
+         * Audio Categories
+         */
+        /**
+         * (General Media): Default for audio, not otherwise specified below; describes enter-
+         * tainment audio, like Music, Podcasts, or streaming audio. Normally without a pre-defined end.
+         */
+        public static final int AUDIO_CONTENT_CATEGORY_GENERAL_MEDIA = 0x00030000;
+        /**
+         * (Navigation): Short sound bites for navigation related information. High-priority
+         * announcements.
+         */
+        public static final int AUDIO_CONTENT_CATEGORY_NAVIGATION = 0x00050000;
+        /**
+         * (Announcements): Short sound bites for informing the driver. Lower priority than
+         * navigation announcements
+         */
+        public static final int AUDIO_CONTENT_CATEGORY_ANNOUNCEMENTS = 0x00080000;
+        /**
+         * (Telephone): Phone call audio; undefined length
+         */
+        public static final int AUDIO_CONTENT_CATEGORY_PHONE = 0xF0000020;
+        /**
+         * (Speech): Short audio interactions between Server and Client; Voice command audio
+         */
+        public static final int AUDIO_CONTENT_CATEGORY_SPEECH = 0xF0000010;
     }
 
     /** 4.11 Data Services  */
@@ -1068,8 +1124,11 @@ public class Defs {
     }
 
     /**
-     * Constants used when interacting with the Location data service.
+     * Constants used when interacting with the Location data service version 1.0.
+     *
+     * @deprecated use {@link com.mirrorlink.android.dataservices.LocationService} instead
      */
+    @Deprecated
     public static final class LocationService {
         /**
          * Location Service name.
@@ -1093,13 +1152,16 @@ public class Defs {
         public static final String TIMESTAMP_FIELD_UID = "0x59413fd1";
     }
     /**
-     * Constants used when interacting with the GPS data service.
+     * Constants used when interacting with the GPS data service version 1.0
+     *
+     * @deprecated use {@link com.mirrorlink.android.dataservices.GPSService} instead
      */
+    @Deprecated
     public static final class GPSService {
         /**
          * GPS Service name.
          */
-        public static final String SERVICE_NAME = "com.mirrorlink.gps";
+        public static final String SERVICE_NAME = "com.mirrorlink.GPS";
         /**
          * NMEA Object uid.
          */

@@ -1,5 +1,5 @@
-/* Copyright 2013-2014 RealVNC ltd.
- * Portions Copyright 2011-2014 Car Connectivity Consortium LLC
+/* Copyright 2013-2016 RealVNC ltd.
+ * Portions Copyright 2011-2016 Car Connectivity Consortium LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,15 +32,17 @@ oneway interface IContextListener {
      * <i>Function reference 0x0802.</i>
      * <br>
      * Framebuffer is blocked from the MirrorLink Client; in case the application has indicated that
-     * it will handle the blocking it MUST remove the blocked content.
+     * it will handle the blocking it SHOULD remove the blocked content.
      * <br>
      * Sometimes the application MUST switch to a new view and update its context information, other
      * times there is nothing the application can do to help unblock the framebuffer. For details of
      * reasons of blocking and what the application is required to do see {@link
      * Defs.BlockingInformation}.
      * <br>
-     * The Server SHOULD only pass the framebuffer blocking notification to the application only if
-     * no reason flag is set to handle the blocking by itself.
+     * The MirrorLink Server MUST pass the notification to the respective application, as soon as
+     * it receives a framebuffer blocking notification message from the MirrorLink Client.
+     * All blocking reasons MUST be handled from the MirrorLink Server; The framebuffer blocking
+     * information is provided to the respective applications for information purpose only.
      *
      * @param reason Reason for Framebuffer blocking. Will have a value defined in {@link
      * Defs.BlockingInformation}.  Note: Blocking because of the wrong
@@ -61,12 +63,14 @@ oneway interface IContextListener {
      * Audio is blocked from the MirrorLink Client; in case the application has indicated that
      * it will handle the blocking it MUST remove the blocked content.
      * <br>
-     * The Server SHOULD only pass the audio blocking notification to the application only if
-     * no reason flag is set to handle the blocking by itself.
+     * The MirrorLink Server MUST pass the notification to the respective application, as soon as
+     * it receives an audio blocking notification message from the MirrorLink Client, with a reason
+     * flag other than 0x00
      * <br>
-     * If handling the audio blocking, the MirrorLink Server MUST either filter the application's
-     * audio, or terminate the application.
-     * <br>
+     * MirrorLink base and drive certified applications, as well as MirrorLink aware applications MUST
+     * either stop, pause or mute the current audio playback, when receiving an audio blocking callback
+     * via the Common API
+      * <br>
      * If the application is handling the blocking but it continues to stream after being notified,
      * then the Server MAY terminate the application.
      *
@@ -90,8 +94,10 @@ oneway interface IContextListener {
      * If the framebuffer was blocked with more than one reason, all the reasons must be resolved
      * before this callback will be issued.
      * <br>
-     * The Server SHOULD only pass the framebuffer unblocking notification to the application only if
-     * no reason flag was set to handle the blocking by itself.
+     * The MirrorLink Server MUST pass send the a framebuffer unblocking notification callback to the respec-
+     * tive applications, as soon as the MirrorLink Server Client moves the MirrorLink Server framebuffer back
+     * into the foreground on the MirrorLink Client display. I.e. the MirrorLink Server starts to receive two con-
+     * secutive Framebuffer Update Request messages with no Framebuffer Blocking Notification in between
      *
      * @see #onFramebufferBlocked
      */
@@ -103,11 +109,11 @@ oneway interface IContextListener {
      * <i>Function reference 0x0806.</i>
      * <br>
      * Audio is unblocked from the MirrorLink Client. This signal will be emitted, if the
-     * MirrorLink Client has previously blocked application's audio stream. The application will
-     * receive this signal, as soon as the MirrorLink Client resumes the audio.
+     * MirrorLink Client has previously blocked application's audio stream.
      * <br>
-     * The Server SHOULD only pass the audio unblocking notification to the application only if
-     * no reason flag was set to handle the blocking by itself.
+     * The MirrorLink Server MUST send an audio unblocking callback to the respective applications, as soon as
+     * it receives an audio blocking notification message from the MirrorLink Client, with a reason flag of
+     * 0x00
      *
      * @see #onAudioBlocked
      */

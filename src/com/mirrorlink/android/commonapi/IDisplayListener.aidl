@@ -1,5 +1,5 @@
-/* Copyright 2013-2014 RealVNC ltd.
- * Portions Copyright 2011-2014 Car Connectivity Consortium LLC
+/* Copyright 2013-2016 RealVNC ltd.
+ * Portions Copyright 2011-2016 Car Connectivity Consortium LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

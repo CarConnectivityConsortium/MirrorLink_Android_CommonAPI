@@ -1,5 +1,5 @@
-/* Copyright 2013-2014 RealVNC ltd.
- * Portions Copyright 2011-2014 Car Connectivity Consortium LLC
+/* Copyright 2013-2016 RealVNC ltd.
+ * Portions Copyright 2011-2016 Car Connectivity Consortium LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,7 +62,8 @@ interface IContextManager {
      * explicit content category (none of the fileds should not be undefined). The coordinates of
      * each rectangle MUST be absolute screen coordinates.
      * @param handleBlocking Flag indicating whether the application will take care of the blocking
-     * if the MirrorLink Client blocks the content.
+     * if the MirrorLink Client blocks the content. MirrorLink Severs MAY ignore the provided value, 
+     * as they are responsible for handling the blocking, inde-pendent of the application’s ability.
      */
     void setFramebufferContextInformation(in List<Bundle> content, in boolean handleBlocking);
 
@@ -77,8 +78,7 @@ interface IContextManager {
      * advertisements, unless otherwise stated from the application using this SET function. The
      * MirrorLink Server MUST use the given values until a new SET function call is issued. The
      * application has to set the application context information prior to starting the audio
-     * stream. Unless set by the application, the MirrorLink Server MUST treat the "Handle Blocking"
-     * flag as being set to a FALSE value.
+     * stream.
      * <br>
      * If no explicit audio context information is set, then the server will behave as if the
      * appplication doesn't handle audio blocking notifications.
@@ -105,7 +105,7 @@ interface IContextManager {
      * the value to a null, or empty array, will reset the audio content category to the value
      * provided in the UPnP application advertisement, if audioContent is true.
      * @param handleBlocking Flag indicating whether the application will take care of the blocking
-     * if the MirrorLink Client blocks the content.
+     * if the MirrorLink Client blocks the content, MUST be set to True.
      */
     void setAudioContextInformation(in boolean audioContent, in int[] audioCategories,
             in boolean handleBlocking);

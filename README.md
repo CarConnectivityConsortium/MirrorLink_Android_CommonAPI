@@ -6,8 +6,8 @@ The mechanism for connecting to the MirrorLink service is defined in the com.mir
 
 # Legal Information
 
-Copyright © 2013-2014 RealVNC Ltd.
-Portions © Copyright 2011-2014 Car Connectivity Consortium LLC.
+Copyright © 2013-2016 RealVNC Ltd.
+Portions © Copyright 2011-2016 Car Connectivity Consortium LLC.
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
